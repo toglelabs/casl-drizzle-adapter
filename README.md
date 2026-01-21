@@ -1,4 +1,4 @@
-# casl-drizzle-adapter
+# @casl/drizzle-adapter
 
 A security-focused TypeScript package to convert [CASL](https://casl.js.org/) authorization rules into [Drizzle ORM](https://orm.drizzle.team/) SQL filters.
 
@@ -14,18 +14,30 @@ It strictly adheres to CASL semantics:
 ## Installation
 
 ```bash
-npm install casl-drizzle-adapter @casl/ability drizzle-orm
+# npm
+npm install @casl/drizzle-adapter
+
+# pnpm
+pnpm add @casl/drizzle-adapter
+
+# yarn
+yarn add @casl/drizzle-adapter
 ```
+
+**Peer Dependencies**:
+You must also install:
+- `@casl/ability`
+- `drizzle-orm`
 
 ## Usage
 
 ### Basic Example
 
 ```ts
-import { createCaslDrizzleAdapter } from "casl-drizzle-adapter";
+import { createCaslDrizzleAdapter } from "@casl/drizzle-adapter";
 import { defineAbility } from "@casl/ability";
 import { pgTable, text, boolean } from "drizzle-orm/pg-core";
-import { db } from "./db"; // Your drizzle db instance, e.g. NodePgDatabase
+import { db } from "./db";
 import { eq } from "drizzle-orm";
 
 // 1. Define Drizzle Schema
@@ -40,21 +52,15 @@ const adapter = createCaslDrizzleAdapter({
   table: posts,
 });
 
-// 3. Define Ability (e.g., for a user)
+// 3. Define Ability
 const ability = defineAbility((can) => {
-  // User can read their own posts
   can("read", "Post", { authorId: "user_1" });
-  // OR public posts
   can("read", "Post", { published: true });
 });
 
 // 4. Generate Filter
 const filter = adapter.filterFromAbility(ability, "read", "Post");
-// Result is equivalent to:
-// or(
-//   eq(posts.authorId, "user_1"),
-//   eq(posts.published, true)
-// )
+// Result: or(eq(posts.authorId, "user_1"), eq(posts.published, true))
 
 // 5. Query
 await db.select().from(posts).where(filter);
@@ -62,7 +68,7 @@ await db.select().from(posts).where(filter);
 
 ### Custom Operators
 
-The adapter ships with `$eq` (default) and `$in`. You can extend it with custom operators using Drizzle's helpers.
+Extend default operators (`$eq`, `$in`) with Drizzle helpers.
 
 ```ts
 import { gt } from "drizzle-orm";
@@ -70,38 +76,24 @@ import { gt } from "drizzle-orm";
 const adapter = createCaslDrizzleAdapter({
   table: posts,
   operators: {
-    $gt: (column, value) => gt(column, value), // Map CASL $gt to Drizzle gt()
+    $gt: (column, value) => gt(column, value),
   },
 });
-
-// Now you can use { views: { $gt: 10 } } in your CASL rules.
 ```
 
-## Semantics & Security
+## Security Guarantees & Semantics
 
-The adapter implements permissions with the following strict logic:
-```
-(ALLOW_RULE_1 OR ALLOW_RULE_2 OR ...)
-AND NOT
-(DENY_RULE_1 OR DENY_RULE_2 OR ...)
-```
+*   **Fail Closed**: Unknown columns or operators always throw errors.
+*   **Permissions**: `(ALLOW_1 OR ALLOW_2) AND NOT (DENY_1 OR DENY_2)`.
+*   **Precedence**: `cannot` rules always override `can` rules via `AND NOT`.
 
-- **Fail Closed**: Unknown columns or operators throw explicit errors.
-- **No Rules**: Returns `null` (allow all). Ensure your CASL ability logic handles "default deny" if that is your intent (typically by not having a "catch-all" allow rule). Wait, **correction**: In CASL, if you have NO rules for a subject, you cannot read it. However, `filterFromRules` takes a LIST of rules.
-    - If `can` rules exist: You get access matching those rules.
-    - If NO rules exist (empty list passed to adapter): The adapter returns `null` (no filter).
-    - **Note**: This adapter assumes you provided the *relevant* rules. If CASL says "cannot read", you shouldn't be running the query. This adapter is for *filtering* the list.
-    - If `ability.rulesFor(...)` returns empty array, it means there are no explicit rules.
-    - **Security Note**: This adapter generates a WHERE clause.
-        - `null` return -> No filter.
-        - `SQL` return -> Apply filter.
-        - `SQL(false)` -> Deny all rows.
+### Limitations
+*   No nested logic (e.g., `$or` inside a condition).
+*   No relation filtering (filtering on joined tables).
 
-### Limitations (v0.1.0)
-- **No Nested Logic**: `$and` / `$or` inside conditions are not supported.
-- **No Relations**: Filtering on related tables (e.g., `author.name`) is not supported.
-- **No Field-level Permissions**: Only row-level security.
-- **No Unknowns**: Any unknown column name in a rule will throw `UnknownColumnError`.
+## Contributing
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ## License
 ISC
