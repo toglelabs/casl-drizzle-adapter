@@ -1,0 +1,43 @@
+{
+  "name": "casl-to-drizzle",
+  "version": "0.1.0",
+  "description": "",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run",
+    "check": "biome check",
+    "check:fix": "biome check --write",
+    "format": "biome format --write",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "peerDependencies": {
+    "@casl/ability": "^6.8.0",
+    "drizzle-orm": "^0.45.1"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.3.11",
+    "@casl/ability": "^6.8.0",
+    "@types/node": "^25.0.9",
+    "drizzle-orm": "^0.45.1",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.17"
+  }
+}
