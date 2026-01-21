@@ -27,6 +27,9 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "publishConfig": {
+    "access": "public"
+  },
   "peerDependencies": {
     "@casl/ability": "^6.8.0",
     "drizzle-orm": "^0.45.1"
