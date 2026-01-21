@@ -1,4 +1,4 @@
-# @casl/drizzle-adapter
+# @toglelabs/casl-drizzle-adapter
 
 A security-focused TypeScript package to convert [CASL](https://casl.js.org/) authorization rules into [Drizzle ORM](https://orm.drizzle.team/) SQL filters.
 
@@ -15,13 +15,13 @@ It strictly adheres to CASL semantics:
 
 ```bash
 # npm
-npm install @casl/drizzle-adapter
+npm install @toglelabs/casl-drizzle-adapter
 
 # pnpm
-pnpm add @casl/drizzle-adapter
+pnpm add @toglelabs/casl-drizzle-adapter
 
 # yarn
-yarn add @casl/drizzle-adapter
+yarn add @toglelabs/casl-drizzle-adapter
 ```
 
 **Peer Dependencies**:
@@ -34,7 +34,7 @@ You must also install:
 ### Basic Example
 
 ```ts
-import { createCaslDrizzleAdapter } from "@casl/drizzle-adapter";
+import { createCaslDrizzleAdapter } from "@toglelabs/casl-drizzle-adapter";
 import { defineAbility } from "@casl/ability";
 import { pgTable, text, boolean } from "drizzle-orm/pg-core";
 import { db } from "./db";

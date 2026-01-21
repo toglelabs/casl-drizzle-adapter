@@ -1,5 +1,5 @@
 {
-  "name": "@casl/drizzle-adapter",
+  "name": "@toglelabs/casl-drizzle-adapter",
   "version": "0.1.0",
   "description": "",
   "type": "module",
