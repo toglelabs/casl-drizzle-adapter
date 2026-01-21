@@ -23,7 +23,7 @@ Thank you for contributing! This package is **security-sensitive**, so we have s
 ## Pull Requests
 
 1.  **Tests**: Required for all behavior changes.
-2.  **Changesets**: Run `pnpm changeset` or `npx changeset` to generate a changelog entry.
+2.  **Changesets**: Run `npm run changeset` or `npx changeset` to generate a changelog entry.
 3.  **Semver**:
     *   **patch**: Bugfixes, docs.
     *   **minor**: New operators, compatible features.
@@ -33,8 +33,8 @@ Thank you for contributing! This package is **security-sensitive**, so we have s
 
 ## Development
 
-1.  Install dependencies: `pnpm install`
-2.  Run tests: `pnpm test`
-3.  Lint: `pnpm check`
+1.  Install dependencies: `npm install`
+2.  Run tests: `npm test`
+3.  Lint: `npm run check`
 
 Thank you for keeping this package secure!
