@@ -91,6 +91,28 @@ const adapter = createCaslDrizzleAdapter({
 *   No nested logic (e.g., `$or` inside a condition).
 *   No relation filtering (filtering on joined tables).
 
+## Testing
+
+This package includes both unit tests and integration tests.
+
+- **Unit tests**: Test the adapter logic without database dependencies.
+- **Integration tests**: Use Testcontainers to run tests against real PostgreSQL databases, ensuring end-to-end functionality.
+
+To run tests:
+
+```bash
+# Unit tests only
+npm run test:unit
+
+# Integration tests (requires Docker)
+npm run test:integration
+
+# All tests
+npm test
+```
+
+Integration tests validate that the generated SQL filters correctly enforce permissions when executed against actual database data.
+
 ## Contributing
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md).
