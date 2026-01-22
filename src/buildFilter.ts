@@ -8,15 +8,13 @@ export function buildFilter(
   table: PgTable,
   operators: OperatorMap,
 ): SQL | null {
-  const canRules = rules.filter((r) => !r.inverted && r.conditions);
-  const cannotRules = rules.filter((r) => r.inverted && r.conditions);
+  const canRules = rules.filter((r) => !r.inverted);
+  const cannotRules = rules.filter((r) => r.inverted);
 
-  const allowFilters = canRules
-    .map((r) => {
-      if (!r.conditions) return null;
-      return mapRuleToSQL({ rule: r.conditions, table, operators });
-    })
-    .filter((f): f is SQL => !!f);
+  const allowResults = canRules.map((r) => {
+    if (!r.conditions) return null; // No conditions = allow all
+    return mapRuleToSQL({ rule: r.conditions, table, operators });
+  });
 
   const denyFilters = cannotRules
     .map((r) => {
@@ -25,12 +23,26 @@ export function buildFilter(
     })
     .filter((f): f is SQL => !!f);
 
+  // If any allow rule has no conditions, allow all
+  const hasAllowAll = allowResults.some((r) => r === null);
+  const allowFilters = allowResults.filter((f): f is SQL => !!f);
+
+  if (hasAllowAll) {
+    // Allow all, but may have denies
+    if (denyFilters.length === 0) {
+      return null; // No WHERE clause = allow all
+    }
+    // Allow all AND NOT denies
+    const deny = not(or(...denyFilters) as SQL);
+    return deny; // WHERE NOT (deny conditions)
+  }
+
   if (allowFilters.length === 0 && denyFilters.length === 0) {
-    return null;
+    return sql`null`; // No permissions = deny all access
   }
 
   if (allowFilters.length === 0) {
-    return sql`false`;
+    return sql`null`; // Only cannot rules = deny all
   }
 
   const allow = or(...allowFilters) as SQL;

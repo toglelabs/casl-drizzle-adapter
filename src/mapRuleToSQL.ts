@@ -1,4 +1,4 @@
-import { and, getTableColumns, type SQL } from "drizzle-orm";
+import { and, getTableColumns, type SQL, sql } from "drizzle-orm";
 import type { PgTable } from "drizzle-orm/pg-core";
 import { UnknownColumnError, UnsupportedOperatorError } from "./errors";
 import type { OperatorMap } from "./types";

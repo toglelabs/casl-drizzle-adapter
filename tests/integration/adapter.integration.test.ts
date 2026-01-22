@@ -162,4 +162,72 @@ describe("casl-drizzle-adapter integration", () => {
     expect(results).toHaveLength(3);
     expect(results.every((r) => (r.views ?? 0) >= 100)).toBe(true);
   });
+
+  // Real-world scenarios
+  it("admin user with no siteId has full site access", async () => {
+    const user = { role: "ADMIN" as const };
+
+    const ability = defineAbility((can) => {
+      if (user.role === "ADMIN") {
+        can("read", "Site"); // No conditions = full access
+      }
+    });
+
+    const filter = adapter.filterFromAbility(ability, "read", "Site");
+
+    const results =
+      filter !== null
+        ? await db.select().from(sites).where(filter)
+        : ability.can("read", "Site")
+          ? await db.select().from(sites)
+          : [];
+
+    // Admin should see ALL sites
+    expect(results).toHaveLength(5);
+  });
+
+  it("user with no permissions gets empty results", async () => {
+    const user = {} as { siteId?: string; role?: string };
+
+    const ability = defineAbility((can) => {
+      if (user.siteId) {
+        can("read", "Site", { id: user.siteId });
+      }
+      if (user.role === "ADMIN") {
+        can("read", "Site");
+      }
+      // No conditions met, so no rules
+    });
+
+    const filter = adapter.filterFromAbility(ability, "read", "Site");
+
+    const results =
+      filter !== null
+        ? await db.select().from(sites).where(filter)
+        : ability.can("read", "Site")
+          ? await db.select().from(sites)
+          : [];
+
+    // Should get empty results
+    expect(results).toHaveLength(0);
+  });
+
+  it("banned user cannot see any sites", async () => {
+    const ability = defineAbility((can, cannot) => {
+      cannot("read", "Site"); // Cannot read any sites
+    });
+
+    const filter = adapter.filterFromAbility(ability, "read", "Site");
+
+    console.log("banned can read", ability.can("read", "Site"));
+    const results =
+      filter !== null
+        ? await db.select().from(sites).where(filter)
+        : ability.can("read", "Site")
+          ? await db.select().from(sites)
+          : [];
+
+    // Should return no sites
+    expect(results).toHaveLength(0);
+  });
 });
