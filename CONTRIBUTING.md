@@ -1,4 +1,4 @@
-# Contributing to @toglelabs/casl-drizzle-adapter
+# Contributing to casl-drizzle-query-adapter
 
 Thank you for contributing! This package is **security-sensitive**, so we have strict rules.
 

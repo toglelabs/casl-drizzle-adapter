@@ -1,5 +1,5 @@
 {
-  "name": "@toglelabs/casl-drizzle-adapter",
+  "name": "casl-drizzle-query-adapter",
   "version": "0.1.0",
   "description": "",
   "type": "module",
